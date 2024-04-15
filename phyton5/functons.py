@@ -1,33 +1,33 @@
-import re
-import os
+import re  #для регулярных выражений
+import os  #для работы с системой
 
 def clear():
-    os.system('cls')
+    os.system('cls') #в дальнейшем очищать консоль для удобства
 
 def input_info():
-    while True:
-        try:
+    while True: #бесконечный цикл для ввода информации о сотруднике. Ввод выполняется до вызова триггера. Триггер - (2)
+        try: #использую для обычной практики.
             print("Вы выбрали *добавить информацию о сотруднике*")
             choice1 = input('Добавить нового сотрудника?(1) / Выйти из опции(2): ')
             choice1 = int(choice1)
             if choice1 == 1:
                 print('Добавим нового сотрудника:')
-                pattern_name = r'[a-zA-Z]+(?:-[a-zA-Z]*)?$'
-                pattern_surname = r'[a-zA-Z]+(?:-[a-zA-Z]*)?$'
-                pattern_sphere = r'[a-zA-Z0-9]+(?: [a-zA-Z0-9]*)?$'
+                template_name = '[a-zA-Z]+(?:-[a-zA-Z]*)?$'    #шаблоны
+                template_surname = '[a-zA-Z]+(?:-[a-zA-Z]*)?$' #шаблоны
+                template_sphere = '[a-zA-Z0-9]+(?: [a-zA-Z0-9]*)?$'    #шаблоны
                 
                 name = input('Введите имя вашего сотрудника: ')
-                while not re.match(pattern_name, name):
+                while not re.match(template_name, name):
                     print('Имя сотрудника введено некорректно! Попробуйте снова...')
                     name = input('Введите имя вашего сотрудника: ')
                     
                 surname = input('Введите фамилию сотрудника {}: '.format(name))
-                while not re.match(pattern_surname, surname):
+                while not re.match(template_surname, surname):
                     print('Фамилия сотрудника введена некорректно! Попробуйте снова...')
                     surname = input('Введите фамилию сотрудника {}: '.format(name))
                 
                 sphere = input('Введите отдел сотрудника {} {}: '.format(name, surname))
-                while not re.match(pattern_sphere, sphere):
+                while not re.match(template_sphere, sphere):
                     print('Отдел сотрудника введен некорректно! Попробуйте снова...')
                     sphere = input('Введите отдел сотрудника {} {}: '.format(name, surname))
                 
@@ -36,7 +36,7 @@ def input_info():
                 while not(0 <= kids < 19):
                     print('У сотрудника не может быть мень 0 и больше 19 детей ')
                 
-                file = open('data.txt', 'a')
+                file = open('data.txt', 'a') 
                 file.write('{}\t{}\t{}\t{}\n'.format(name,surname,sphere,kids))
                 file.close()
 
@@ -44,40 +44,52 @@ def input_info():
             elif choice1 == 2:
                 break
             else:
-                raise ValueError
+                raise ValueError #генерация объекта исключения
         except ValueError:
             print('Ввод должен быть либо (1), либо (2)')
 
 def show_info():
     print("Вы выбрали *показать информацию о сотрудниках*")
     file = open('data.txt', 'r')
-    file_elements = file.readlines()
+    file_elements = file.readlines()#разбиваю строку
     total_kids = 0
     print('Список сотрудников и их детей: ')
-    for i in file_elements:
-        list = i.strip().split('\t')
-        name = list[0]
-        surname = list[1]
-        sphere = list[2]
-        kids = list[3]
-        print('{}, {}, {}'.format(name, surname, kids))
-        total_kids += int(kids)
-    print('Общее количество детей <= 18 лет = ', total_kids)
+    try:
+        if not file_elements:
+            raise IndexError
+        for i in file_elements:
+            list_one = i.strip().split('\t')
+            name = list_one[0]
+            surname = list_one[1]
+            sphere = list_one[2]
+            kids = list_one[3]
+            print('{} {} {}'.format(name, surname, kids))
+            total_kids += int(kids)
+        print('Общее кол-во детей = {}'.format(total_kids))
+    except IndexError:
+        print("Ошибка: ваш список либо пуст, либо сотрудники вводились неверным форматом")
+
 
 def childfree_info():
-    childfree_array = []
+    childfree_list = []
     file = open('data.txt', 'r')
     file_elements = file.readlines()
     print('Список сотрудников без детей: ')
-    for i in file_elements:
-        list = i.strip().split('\t')
-        name = list[0]
-        surname = list[1]
-        kids = list[3]
-        if kids == '0':
-            name_surname = name + ' '+ surname
-            childfree_array.append((name_surname))
-    print(childfree_array)
+    try:
+        if not file_elements:
+            raise IndexError
+        for i in file_elements:
+            list = i.strip().split('\t')
+            name = list[0]
+            surname = list[1]
+            kids = list[3]
+            if kids == '0':
+                name_surname = name + ' '+ surname
+                childfree_list.append((name_surname))
+        print(childfree_list)    
+    except IndexError:
+        print("Ошибка: ваш список либо пуст, либо сотрудники вводились неверным форматом")
+    
 
 def menu():
     while True:

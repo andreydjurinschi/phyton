@@ -1,1 +1,2 @@
-Andrei	Djurinschi	IT	0
+Andrei	Djurinschi	It	0
+Dmitrii	Kambur	It	5
