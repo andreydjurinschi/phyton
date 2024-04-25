@@ -6,10 +6,12 @@ def clear():
     os.system('cls') # в дальнейшем очищать консоль
 
 def write_transactions_to_file(place, tr_type, tr_date, tr_time, tr_amount): # запись транзакции в файл
-    print("Записываем данные в ваш файл {}".format(place))
-    file = open(place, "a", encoding='utf-8')
-    file.write("{}\t{}\t{}\t{}\n".format(tr_type,tr_date,tr_time,tr_amount))
-    file.close()
+    try:
+        with open(place, "a", encoding='utf-8') as file:
+            file.write("{}\t{}\t{}\t{}\n".format(tr_type,tr_date,tr_time,tr_amount))
+    except Exception as e:
+        print("Ошибка при записи в файл:", e)
+
 
 def check_date(tr_date_check):
     try:
@@ -54,9 +56,9 @@ def sum_of_all_transactions(place): # сумма всех транзакций
         tr_amount = get_lines[3]
         tr_type = get_lines[0]
         tr_amount = float(tr_amount)
-        if tr_type == 'доход':
+        if tr_type == 'доход' or tr_type == "Доход":
             total += tr_amount
-        else:
+        elif tr_type == 'расход' or tr_type == "Расход":
             total -= tr_amount
     file.close()
     return total
@@ -68,24 +70,25 @@ def most_profitable_transaction(place): # самая прибыльная тра
     for line in file:
         tr_type, tr_date, tr_time, tr_amount = line.split("\t")
         tr_amount = float(tr_amount)
-        if tr_type == "доход" and tr_amount > max_amount:
+        if tr_type == "доход" or "Доход" and tr_amount > max_amount:
             max_amount = tr_amount
             most_profitable_transaction = (tr_type, tr_date, tr_time, tr_amount)
     file.close()
     return most_profitable_transaction
 
 def most_unprofitable_transaction(place): # самая убыточная транзакция
-    min_amount = float('inf')
+    min_amount = float('inf') 
     most_unprofitable_transaction = None
     file = open(place, "r", encoding='utf-8')
     for line in file:
         tr_type, tr_date, tr_time, tr_amount = line.split("\t")
         tr_amount = float(tr_amount)
-        if tr_type == "расход" and tr_amount < min_amount:
+        if tr_type == "расход" or "Расход" and tr_amount < min_amount:
             min_amount = tr_amount
             most_unprofitable_transaction = (tr_type, tr_date, tr_time, tr_amount)
     file.close()
     return most_unprofitable_transaction
+
 
 def menu():
     place = "transactions.txt"
@@ -107,22 +110,22 @@ def menu():
                 tr_date = input("Введите дату вашей транзакции (день.месяц.год): ")
                 if not check_date(tr_date):
                     print("Недопустимая дата, попробуйте снова... ")
-                tr_date = input("Введите дату вашей транзакции (день.месяц.год): ")
+                    continue
                 
                 tr_time = input("Введите время совершенной транзакции (час:минуты): ")
                 if not check_time(tr_time):
                     print("Недопустимое время, попробуйте снова...")
-                tr_time = input("Введите время совершенной транзакции (час:минуты): ")
+                    continue
 
                 tr_type = input("Введите тип вашей транзакции (доход / расход): ")
                 if not check_tr_type(tr_type):
                     print("Недопустимый тип транзакции, попробуйте снова...")
-                tr_type = input("Введите тип вашей транзакции (доход / расход): ")
+                    continue
 
                 tr_amount = input("Введите сумму вашей транзакции: ")
                 if not check_tr_amount(tr_amount):
                     print("Недопустимая сумма, попробуйте снова...")
-                tr_amount = input("Введите сумму вашей транзакции: ")
+                    continue
                 
                 write_transactions_to_file(place, tr_type, tr_date, tr_time, tr_amount)
                 print("Транзакция успешно записана в файл  {} \n".format(place))
@@ -156,7 +159,7 @@ def menu():
                         print("Невозможно найти самую убыточную транзакцию, скорее всего вы не ввели ни одной транзакции...")
                     else:
                         print("Отчет о самой убыточной транзакции")
-                        print("Тип - {}, Дата - {}, Время - {}, Доход - {} ".format(regress[0],  regress[1], regress[2], regress[3]))
+                        print("Тип - {}, Дата - {}, Время - {}, Расход - {} ".format(regress[0],  regress[1], regress[2], regress[3]))
                 except FileNotFoundError:
                     print("Для начала вам нужно создать транзакцию и записать ее в файл! ")
             
@@ -166,6 +169,3 @@ def menu():
             
         except ValueError:
             print("Нет такого пункта меню...")
-
-if __name__ == "__main__":
-    menu()
